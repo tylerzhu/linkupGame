@@ -38,6 +38,8 @@ package framework.view.componets.ui.dialogs
 					}
 					
 					m_view["closeBtn"].addEventListener(MouseEvent.CLICK, onClose);
+					m_view.x = StageUtil.stage.width - m_view.width >> 2;
+					m_view.y = StageUtil.stage.height - m_view.height >> 2;
 					StageUtil.stage.addChild(m_view);
 				});
 		}

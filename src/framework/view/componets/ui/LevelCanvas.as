@@ -33,6 +33,7 @@ package framework.view.componets.ui
 			m_curLev = data.level;
 			m_levelData = data.levelData;
 			m_time = data.time;
+			m_restTime = data.time;
 			m_sortNum = data.sortNum;
 			m_tipNum = data.tipNum;
 			
@@ -76,6 +77,7 @@ package framework.view.componets.ui
 		
 			if (eraseNum == len) 
 			{
+				GameTimer.getInstance().unregister("time");
 				var dialog:ResultDialog = new ResultDialog(true);
 				dialog.addEventListener("nextLevel", onNextLevel);
 				dialog.show();
@@ -175,7 +177,7 @@ package framework.view.componets.ui
 			}
 			else
 			{
-				GameTimer.getInstance().register("time", 1000, m_time, updateTime);
+				GameTimer.getInstance().register("time", 1000, m_restTime, updateTime);
 				m_view["mc_pause"]["tf_pause"].text = "暂停";
 				m_view["mItemList"].visible = true;
 			}
@@ -200,23 +202,27 @@ package framework.view.componets.ui
 		{
 			if (currCount == m_time)
 			{
+				m_restTime = 0;
 				//时间用完了
-				//dispatchEvent(new MyEvent(ApplicationConstants.GAME_OVER, { "isWin": true }
 				var dialog:ResultDialog = new ResultDialog(false);
 				dialog.addEventListener("reStart", onReStart);
 				dialog.show();
+				return;
 			}
-			m_view["tf_time"].text = (m_time - currCount) + "秒";
+			m_restTime = (m_restTime - currCount);
+			m_view["tf_time"].text = m_restTime + "秒";
 			m_view["mc_time"].width = 600 - currCount * (600 / m_time);
 		}
 		
 		private function onReStart(e:MyEvent):void 
 		{
+			GameTimer.getInstance().unregister("time");
 			dispatchEvent(new MyEvent(ApplicationConstants.SEND_2_FRAME, { "event": ApplicationConstants.SELECT_LEVEL, "data":m_curLev } ));
 		}
 		
 		private function onNextLevel(evt:MyEvent):void 
 		{
+			GameTimer.getInstance().unregister("time");
 			dispatchEvent(new MyEvent(ApplicationConstants.SEND_2_FRAME, { "event": ApplicationConstants.SELECT_LEVEL, "data":m_curLev + 1 } ));
 		}
 		
@@ -225,6 +231,7 @@ package framework.view.componets.ui
 		private var m_curLev:int;
 		private var m_levelData:Array;
 		private var m_time:int;
+		private var m_restTime:int;
 		private var m_sortNum:int;
 		private var m_tipNum:int;
 		
